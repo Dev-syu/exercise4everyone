@@ -1,4 +1,4 @@
-package kr.co.ddoko.memberservice.common.kafka;
+package kr.co.ddoko.exercise4everyone.common.kafka;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
