@@ -1,5 +1,6 @@
 package kr.co.ddoko.memberservice.service;
 import kr.co.ddoko.memberservice.common.dto.TeamDto;
+import kr.co.ddoko.memberservice.common.dto.TeamInvolveDto;
 import kr.co.ddoko.memberservice.domain.team.Team;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,19 +17,22 @@ import static org.junit.jupiter.api.Assertions.*;
 class TeamServiceTest {
     @Autowired
     private TeamService teamService;
+    @Autowired
+    private TeamInvolveService teamInvolveService;
+
     @Test
-    @Rollback(value = false)
+//    @Rollback(value = false)
     void saveTeam테스트() {
         // Given
         TeamDto.SaveRequest saveRequest = TeamDto.SaveRequest.builder()
-                .title("hive")
-                .master("김승훈")
+                .title("kingdom")
+                .master("바보")
                 .location("창원")
                 .build();
 
         //When
         Team savedTeam = teamService.saveTeam(saveRequest);
-        Optional<Team> optionalTeam = teamService.findByTeam("hive", "김승훈", "창원");
+        Optional<Team> optionalTeam = teamService.findByTeam("kingdom", "바보", "창원");
 
         // Then
         assertNotNull(savedTeam.getTid(), "Saved team should have an ID");
@@ -48,7 +52,7 @@ class TeamServiceTest {
 //    @Rollback(value = false)
     void removeTeam() {
         // Arrange
-        Optional<Team> optionalTeam = teamService.findByTeam("New Team", "John Doe", "Test Location");
+        Optional<Team> optionalTeam = teamService.findByTeam("hive", "김승훈", "창원");
 
         // Assert
         assertTrue(optionalTeam.isPresent(), "팀이 존재해야 합니다.");
@@ -59,10 +63,14 @@ class TeamServiceTest {
                 .master(optionalTeam.get().getMaster())
                 .location(optionalTeam.get().getLocation())
                 .build();
-        teamService.removeTeam(removeRequest);
 
+        TeamInvolveDto.RemoveRequest involveRemoveRequest = TeamInvolveDto.RemoveRequest.builder()
+                .team(optionalTeam.get())
+                .build();
+
+        teamService.removeTeam(removeRequest);
         // Assert
-        optionalTeam = teamService.findByTeam("New Team", "John Doe", "Test Location");
+        optionalTeam = teamService.findByTeam("hive", "김승훈", "창원");
         assertFalse(optionalTeam.isPresent(), "팀이 삭제되어야 합니다.");
     }
 }

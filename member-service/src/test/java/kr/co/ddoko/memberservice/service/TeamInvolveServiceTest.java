@@ -9,11 +9,9 @@ import kr.co.ddoko.memberservice.domain.embedded.State;
 import kr.co.ddoko.memberservice.domain.members.Member;
 import kr.co.ddoko.memberservice.domain.team.Team;
 import kr.co.ddoko.memberservice.domain.team.TeamInvolve;
-import kr.co.ddoko.memberservice.domain.team.TeamInvolveRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,10 +28,10 @@ class TeamInvolveServiceTest {
     @Autowired
     private MemberService memberService;
     @Test
-    @Rollback(value = false)
+    //@Rollback(value = false)
     void saveTeamInvolve() {
         MemberDto.SaveRequest memberSaveRequest = MemberDto.SaveRequest.builder()
-                .id("dbtjd")
+                .id("dbtjd123")
                 .password("password123")
                 .name("John Doe")
                 .sex(Sex.female())
@@ -48,16 +46,16 @@ class TeamInvolveServiceTest {
                 .build();
 
         memberService.saveMember(memberSaveRequest);
-        Member member = memberService.findById("dbtjd").get();
+        Member member = memberService.findById("dbtjd123").get();
 
         TeamDto.SaveRequest teamSaveRequest = TeamDto.SaveRequest.builder()
-                .title("NewJins")
-                .master("ggl")
-                .location("내맘")
+                .title("NewJins12")
+                .master("ggl12")
+                .location("내맘12")
                 .build();
 
         teamService.saveTeam(teamSaveRequest);
-        Team team = teamService.findByTeam("NewJins","ggl","내맘").get();
+        Team team = teamService.findByTeam("NewJins12", "ggl12", "내맘12").get();
 
         TeamInvolveDto.SaveRequest saveRequest = TeamInvolveDto.SaveRequest.builder()
                 .member(member)
@@ -65,23 +63,17 @@ class TeamInvolveServiceTest {
                 .state(State.stay())
                 .build();
 
+        // Act
         TeamInvolve teamInvolve = teamInvolveService.saveTeamInvolve(saveRequest);
 
-        MemberDto.ChargeRequest chargeRequest  = MemberDto.ChargeRequest.builder()
-                .id(member.getId())
-                .newPassword(member.getPassword())
-                .newName(member.getName())
-                .sex(member.getSex())
-                .newWeight(member.getWeight())
-                .birthDay(member.getBirthDay())
-                .newBelt(member.getBelt())
-                .newPhone(member.getPhone())
-                .newEmail(member.getEmail())
-                .newPermission(member.getPermission())
-                .newSleepAccount(member.isSleepAccount())
-                .newTeamInvolve(teamInvolve)
-                .build();
-
-        memberService.updateMemberInfo(chargeRequest);
+        // Assert
+        assertNotNull(teamInvolve, "팀 인보크가 저장되어야 합니다.");
+        assertNotNull(teamInvolve.getId(), "팀 인보크 ID가 설정되어야 합니다.");
+        assertEquals(member, teamInvolve.getMember(), "팀 인보크의 멤버가 올바르게 설정되어야 합니다.");
+        assertEquals(team, teamInvolve.getTeam(), "팀 인보크의 팀이 올바르게 설정되어야 합니다.");
+        System.out.println("teamInvolve.getState()"+teamInvolve.getState().getValue());
+        System.out.println("teamInvolve.getState()"+State.stay());
+        assertEquals(State.stay().getValue(), teamInvolve.getState().getValue(), "팀 인보크의 상태가 올바르게 설정되어야 합니다.");
     }
+
 }

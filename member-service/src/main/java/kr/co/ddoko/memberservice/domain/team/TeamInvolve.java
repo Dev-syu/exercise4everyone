@@ -16,7 +16,7 @@ public class TeamInvolve {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // 별도의 id 필드를 추가
+    private Long id;
 
     @OneToOne
     @JoinColumn(name = "member_mid")
@@ -30,11 +30,15 @@ public class TeamInvolve {
     private State state;
 
     public void updateTeamInvolve(TeamInvolveDto.ChangeRequest changeRequest){
+        this.member = changeRequest.getMember();
         this.team = changeRequest.getTeam();
         this.state = changeRequest.getState();
     }
 
     public void removeTeamInvolve(TeamInvolveDto.RemoveRequest removeRequest){
+        this.id = removeRequest.getId();
+    }
+    public void banishTeamInvolve(TeamInvolveDto.RemoveRequest removeRequest){
         this.state = removeRequest.getState();
     }
 

@@ -13,6 +13,7 @@ public class TeamInvolveDto {
     @AllArgsConstructor
     @Getter
     public static abstract class BaseRequest {
+        protected Long id;
         protected Member member;
         protected Team team;
         protected State state;
@@ -21,8 +22,8 @@ public class TeamInvolveDto {
     }
     public static class SaveRequest extends BaseRequest{
         @Builder
-        public SaveRequest(Member member, Team team, State state) {
-            super(member,team,state);
+        public SaveRequest(Long id, Member member, Team team, State state) {
+            super(id, member,team,state);
         }
 
         @Override
@@ -40,8 +41,9 @@ public class TeamInvolveDto {
         private State newState;
 
         @Builder
-        public ChangeRequest(Member member, Team newTeam, State newState) {
-            super(member,newTeam,newState);
+        public ChangeRequest(Long id, Member member, Team newTeam, State newState) {
+            super(id, member,newTeam,newState);
+            this.member = member;
             this.newTeam = newTeam;
             this.newState = newState;
         }
@@ -57,12 +59,11 @@ public class TeamInvolveDto {
     }
 
     public static class RemoveRequest extends BaseRequest{
-        private State newState;
 
         @Builder
-        public RemoveRequest(Member member, Team team, State newState) {
-            super(member,team,newState);
-            this.newState = newState;
+        public RemoveRequest(Long id,Member member, Team team, State state) {
+            super(id, member,team,state);
+            this.state = state;
         }
 
         @Override
@@ -70,7 +71,7 @@ public class TeamInvolveDto {
             return TeamInvolve.builder()
                     .member(this.member)
                     .team(this.team)
-                    .state(this.newState)
+                    .state(this.state)
                     .build();
         }
     }

@@ -27,7 +27,7 @@ public class MemberServiceTest {
     public void saveRequestToEntityTest() {
         // Given
         MemberDto.SaveRequest saveRequest = MemberDto.SaveRequest.builder()
-                .id("john_doe")
+                .id("john_doe3")
                 .password("password123")
                 .name("John Doe")
                 .sex(Sex.female())
@@ -45,7 +45,7 @@ public class MemberServiceTest {
         Member savedMember = memberService.saveMember(saveRequest);
 
         // Then
-        Optional<Member> findMember = memberService.findById("john_doe");
+        Optional<Member> findMember = memberService.findById("john_doe3");
         assertTrue(findMember.isPresent(), "멤버가 저장되어야 합니다.");
     }
 
@@ -54,30 +54,36 @@ public class MemberServiceTest {
 //    @Rollback(value = false)
     public void UpdateMemberPasswordTest() {
         // Given
-        Member originalMember = memberService.findById("john_doe").orElseThrow();
+        Optional<Member> optionalMember = memberService.findById("john_doe");
+        if(optionalMember.isPresent()){
+            Member originalMember = optionalMember.get();
+            MemberDto.ChargeRequest chargeRequest = MemberDto.ChargeRequest.builder()
+                    .id(originalMember.getId())
+                    .newPassword("1234")
+                    .newName(originalMember.getName())
+                    .sex(originalMember.getSex())
+                    .newWeight(originalMember.getWeight())
+                    .birthDay(originalMember.getBirthDay())
+                    .newBelt(originalMember.getBelt())
+                    .newPhone(originalMember.getPhone())
+                    .newEmail(originalMember.getEmail())
+                    .newPermission(originalMember.getPermission())
+                    .newSleepAccount(originalMember.isSleepAccount())
+                    .newTeamInvolve(originalMember.getTeamInvolve())
+                    .build();
 
-        MemberDto.ChargeRequest chargeRequest = MemberDto.ChargeRequest.builder()
-                .id(originalMember.getId())
-                .newPassword("1234")
-                .newName(originalMember.getName())
-                .sex(originalMember.getSex())
-                .newWeight(originalMember.getWeight())
-                .birthDay(originalMember.getBirthDay())
-                .newBelt(originalMember.getBelt())
-                .newPhone(originalMember.getPhone())
-                .newEmail(originalMember.getEmail())
-                .newPermission(originalMember.getPermission())
-                .newSleepAccount(originalMember.isSleepAccount())
-                .newTeamInvolve(originalMember.getTeamInvolve())
-                .build();
+            // When
+            memberService.updateMemberPassword(chargeRequest);
 
-        // When
-        memberService.updateMemberPassword(chargeRequest);
+            // Then
+            Member updatedMember = memberService.findById("john_doe").orElseThrow();
+            assertEquals("1234", updatedMember.getPassword(), "비밀번호가 업데이트되어야 합니다.");
+            assertEquals(originalMember.getName(), updatedMember.getName(), "이름은 변경되지 않아야 합니다.");
+        }else {
+            fail();
+        }
 
-        // Then
-        Member updatedMember = memberService.findById("john_doe").orElseThrow();
-        assertEquals("1234", updatedMember.getPassword(), "비밀번호가 업데이트되어야 합니다.");
-        assertEquals(originalMember.getName(), updatedMember.getName(), "이름은 변경되지 않아야 합니다.");
+
 
     }
     @Test
@@ -115,7 +121,25 @@ public class MemberServiceTest {
 //    @Rollback(value = false)
     void removeMemberTest() {
         // Given
-        Member originalMember = memberService.findById("john_doe").orElseThrow();
+        MemberDto.SaveRequest saveRequest = MemberDto.SaveRequest.builder()
+                .id("john_doe3")
+                .password("password123")
+                .name("John Doe")
+                .sex(Sex.female())
+                .weight(70)
+                .birthDay("1990-01-01")
+                .belt(2)
+                .phone("123-456-7890")
+                .email("john.doe@example.com")
+                .permission(Permission.user())
+                .sleepAccount(false)
+                .teamInvolve(null)
+                .build();
+
+        // When
+        Member savedMember = memberService.saveMember(saveRequest);
+
+        Member originalMember = memberService.findById("john_doe3").orElseThrow();
 
         MemberDto.RemoveRequest removeRequest = MemberDto.RemoveRequest.builder()
                 .id(originalMember.getId())
@@ -125,7 +149,7 @@ public class MemberServiceTest {
         memberService.removeMember(removeRequest);
 
         // Then
-        Optional<Member> removedMemberOptional = memberService.findById("john_doe");
+        Optional<Member> removedMemberOptional = memberService.findById("john_doe3");
 
         assertFalse(removedMemberOptional.isPresent(), "회원이 삭제되어야 합니다.");
     }

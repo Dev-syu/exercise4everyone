@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import kr.co.ddoko.memberservice.common.dto.MemberDto.*;
+import kr.co.ddoko.memberservice.common.kafka.KafkaProducerService;
 import kr.co.ddoko.memberservice.domain.members.Member;
 import kr.co.ddoko.memberservice.domain.members.MemberRepository;
 import kr.co.ddoko.memberservice.exception.member.DuplicateMemberIdException;
@@ -21,6 +22,9 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     @Autowired
+    KafkaProducerService kafkaProducerService;
+
+    @Autowired
     public MemberService(MemberRepository memberRepository) {
         this.memberRepository = memberRepository;
     }
@@ -29,7 +33,10 @@ public class MemberService {
         if (isDuplicateId(saveRequest.getId())) {
             throw new DuplicateMemberIdException("이미 존재하는 아이디입니다: " + saveRequest.getId());
         }
-        return memberRepository.save(saveRequest.toEntity());
+
+        Member result = memberRepository.save(saveRequest.toEntity());
+//        kafkaProducerService.memberUpdateTopic(result);
+        return result;
     }
 
     @Transactional(readOnly = true)
@@ -71,6 +78,7 @@ public class MemberService {
             optionalMember.ifPresent(member -> {
                 member.updatePassword(newPassword);
                 em.persist(member);
+//                kafkaProducerService.memberUpdateTopic(member);
             });
             return optionalMember;
         } catch (Exception e) {
@@ -87,6 +95,7 @@ public class MemberService {
             optionalMember.ifPresent(member -> {
                 member.updateInfo(newInfo);
                 em.persist(member);
+//                kafkaProducerService.memberUpdateTopic(member);
             });
             return optionalMember;
         } catch (Exception e) {
@@ -97,7 +106,11 @@ public class MemberService {
     @Transactional
     public void removeMember(RemoveRequest removeRequest) {
         Optional<Member> optionalMember = findById(removeRequest.getId());
-        optionalMember.ifPresent(member -> em.remove(member));
+        optionalMember.ifPresent(member ->{
+                em.remove(member);
+//                kafkaProducerService.memberUpdateTopic(member);
+            }
+        );
     }
     private boolean isDuplicateId(String id) {
         Optional<Member> existingMember = findById(id);
