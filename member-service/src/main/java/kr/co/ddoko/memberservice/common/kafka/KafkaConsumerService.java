@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class KafkaConsumerService {
 
-    @KafkaListener(topics = "Member-Service", groupId = "kafka-member")
-    public void consumeMessage(ConsumerRecord<String, String> record) {
-        System.out.println("Received message: " + record.value());
-    }
+//    @KafkaListener(topics = "Member-Service", groupId = "kafka-member")
+//    public void consumeMessage(ConsumerRecord<String, String> record) {
+//        System.out.println("Received message: " + record.value());
+//    }
 }

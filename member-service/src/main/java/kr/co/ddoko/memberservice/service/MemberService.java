@@ -21,8 +21,8 @@ public class MemberService {
     private EntityManager em;
     private final MemberRepository memberRepository;
 
-    @Autowired
-    KafkaProducerService kafkaProducerService;
+    //@Autowired
+    //KafkaProducerService kafkaProducerService;
 
     @Autowired
     public MemberService(MemberRepository memberRepository) {
